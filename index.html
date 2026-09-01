@@ -782,7 +782,7 @@ function submitOrder() {
 
   alert("Pembayaran Saldo Berhasil! Pesanan Anda sedang diproses.");
 
-  window.open(`https://wa.me/${6282379236253}?text=${encodeURIComponent(`Halo Admin, pesanan baru:\n\nPEMESAN:\nNama: ${senderName}\nHP: ${senderPhone}\n\nPENERIMA:\nNama: ${receiverName}\nHP: ${receiverPhone}\nAlamat: ${receiverAddress}\n\nBARANG:\n${itemNames}\n\nTotal Dipotong Saldo: Rp ${total.toLocaleString('id-ID')}`)}`, '_blank');
+  window.open(`https://wa.me/6282379236253?text=${encodeURIComponent(`Halo Admin, pesanan baru:\n\nPEMESAN:\nNama: ${senderName}\nHP: ${senderPhone}\n\nPENERIMA:\nNama: ${receiverName}\nHP: ${receiverPhone}\nAlamat: ${receiverAddress}\n\nBARANG:\n${itemNames}\n\nTotal Dipotong Saldo: Rp ${total.toLocaleString('id-ID')}`)}`, '_blank');
   
   cart = []; 
   updateCartUI();
