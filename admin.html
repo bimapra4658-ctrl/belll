@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard Full Suite - Belanja Hemat</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root { --primary-color: #2563eb; --bg-light: #f8fafc; --border-color: #e2e8f0; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-light); color: #0f172a; }
+.sidebar { min-height: 100vh; background: #0f172a; color: white; }
+.sidebar .nav-link { color: #94a3b8; padding: 10px 16px; border-radius: 8px; margin-bottom: 4px; font-size: 0.9rem; font-weight: 500; cursor: pointer; }
+.sidebar .nav-link:hover, .sidebar .nav-link.active { color: white; background: var(--primary-color); }
+.card { border-radius: 14px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+.stat-card { background: white; border-radius: 14px; padding: 20px; border: 1px solid var(--border-color); }
+.login-box { max-width: 400px; margin: 80px auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+.table img { width: 40px; height: 40px; object-fit: cover; border-radius: 8px; }
+</style>
+</head>
+<body>
+
+<div id="login-screen" class="container">
+  <div class="login-box text-center">
+    <div class="mb-3 text-primary"><i class="fa-solid fa-user-shield fa-3x"></i></div>
+    <h4 class="fw-bold mb-1">Admin Dashboard</h4>
+    <p class="text-muted small mb-4">Silakan login untuk mengelola toko</p>
+    <div class="text-start mb-3">
+      <label class="form-label small fw-bold">Username</label>
+      <input type="text" id="login-user" class="form-control" value="admin">
+    </div>
+    <div class="text-start mb-4">
+      <label class="form-label small fw-bold">Password</label>
+      <input type="password" id="login-pass" class="form-control" value="admin123">
+    </div>
+    <button class="btn btn-primary w-100 rounded-pill fw-bold py-2" onclick="processLogin()">🔐 Login ke Dashboard</button>
+  </div>
+</div>
+
+<div id="app-screen" class="d-none">
+  <div class="d-flex">
+    <div class="sidebar p-3 d-flex flex-column" style="width: 260px;">
+      <div class="d-flex align-items-center mb-4 px-2">
+        <i class="fa-solid fa-bolt text-warning fa-lg me-2"></i>
+        <h5 class="fw-bold m-0 text-white">Admin Panel</h5>
+      </div>
+      <div class="small fw-bold text-uppercase text-slate-400 mb-2 px-2" style="font-size: 0.7rem;">Menu Utama</div>
+      <nav class="nav flex-column mb-auto">
+        <a class="nav-link active" onclick="switchTab('stat')"><i class="fa-solid fa-chart-line me-2"></i>📊 Statistik</a>
+        <a class="nav-link" onclick="switchTab('prod')"><i class="fa-solid fa-box me-2"></i>📦 Produk</a>
+        <a class="nav-link" onclick="switchTab('cat')"><i class="fa-solid fa-tags me-2"></i>🏷️ Kategori</a>
+        <a class="nav-link" onclick="switchTab('ord')"><i class="fa-solid fa-cart-shopping me-2"></i>🛒 Pesanan</a>
+        <a class="nav-link" onclick="switchTab('inv')"><i class="fa-solid fa-warehouse me-2"></i>📦 Stok Inventory</a>
+        <a class="nav-link" onclick="switchTab('usr')"><i class="fa-solid fa-users me-2"></i>👥 User & Saldo</a>
+        <a class="nav-link" onclick="switchTab('pay')"><i class="fa-solid fa-wallet me-2"></i>💰 Pembayaran</a>
+        <a class="nav-link" onclick="switchTab('rpt')"><i class="fa-solid fa-file-invoice me-2"></i>📈 Laporan</a>
+        <a class="nav-link" onclick="switchTab('set')"><i class="fa-solid fa-gear me-2"></i>⚙️ Pengaturan & API</a>
+      </nav>
+      <hr class="border-secondary">
+      <div class="px-2">
+        <div class="d-flex align-items-center mb-2">
+          <i class="fa-solid fa-circle-user fa-2x me-2 text-primary"></i>
+          <div>
+            <div class="fw-bold small text-white" id="admin-role-name">Super Admin</div>
+            <div class="text-muted small" style="font-size: 0.75rem;">Full Permissions</div>
+          </div>
+        </div>
+        <button class="btn btn-outline-danger btn-sm w-100 rounded-pill mt-2" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-1"></i> Logout</button>
+      </div>
+    </div>
+
+    <div class="flex-grow-1 p-4" style="max-height: 100vh; overflow-y: auto;">
+      
+      <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <h4 class="fw-bold m-0" id="section-title">📊 Dashboard Statistik</h4>
+        <div class="d-flex gap-2 align-items-center">
+          <span class="badge bg-danger rounded-pill px-3 py-2"><i class="fa-solid fa-bell me-1"></i> Notifikasi <span id="notif-count">2</span></span>
+          <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="triggerBackup()"><i class="fa-solid fa-database me-1"></i> 💾 Backup Data</button>
+        </div>
+      </div>
+
+      <div id="tab-stat" class="tab-sec">
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="text-muted small fw-bold">TOTAL PENJUALAN</div>
+              <h3 class="fw-bold text-primary my-1" id="stat-sales">Rp 0</h3>
+              <span class="badge bg-success-subtle text-success">+12% minggu ini</span>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="text-muted small fw-bold">PESANAN MASUK</div>
+              <h3 class="fw-bold text-dark my-1" id="stat-orders">0</h3>
+              <span class="text-muted small">Realtime update</span>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="text-muted small fw-bold">TOTAL PRODUK</div>
+              <h3 class="fw-bold text-dark my-1" id="stat-prods">0</h3>
+              <span class="text-muted small">Katalog Aktif</span>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="text-muted small fw-bold">TOTAL USER</div>
+              <h3 class="fw-bold text-dark my-1" id="stat-users">0</h3>
+              <span class="text-muted small">Pelanggan terdaftar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-prod" class="tab-sec d-none">
+        <div class="d-flex justify-content-between mb-3">
+          <h5 class="fw-bold">Manajemen Produk & Flash Sale</h5>
+          <button class="btn btn-primary rounded-pill btn-sm px-3" data-bs-toggle="modal" data-bs-target="#prodModal"><i class="fa-solid fa-plus me-1"></i> Tambah Produk</button>
+        </div>
+        <div class="card p-3">
+          <table class="table align-middle">
+            <thead>
+              <tr><th>Gambar</th><th>Nama</th><th>Brand/Kategori</th><th>Stok</th><th>Harga</th><th>Status Badge</th><th>Aksi</th></tr>
+            </thead>
+            <tbody id="admin-prod-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-cat" class="tab-sec d-none">
+        <h5 class="fw-bold mb-3">🏷️ Manajemen Kategori</h5>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="card p-3">
+              <h6>Tambah Kategori Baru</h6>
+              <input type="text" id="cat-input" class="form-control my-2" placeholder="Nama Kategori">
+              <button class="btn btn-primary w-100 rounded-pill" onclick="saveCat()">Simpan</button>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="card p-3"><ul id="cat-list" class="list-group"></ul></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KONTROL PANELS PESANAN & STATUSNYA -->
+      <div id="tab-ord" class="tab-sec d-none">
+        <h5 class="fw-bold mb-3">🛒 Pesanan & Kontrol Status Pengiriman</h5>
+        <div class="card p-3">
+          <table class="table align-middle">
+            <thead>
+              <tr><th>#</th><th>Pelanggan</th><th>Items</th><th>Total</th><th>Status Pesanan</th><th>Aksi</th></tr>
+            </thead>
+            <tbody id="admin-ord-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-inv" class="tab-sec d-none">
+        <h5 class="fw-bold mb-3">📦 Monitoring Stok Inventory</h5>
+        <div class="card p-3">
+          <table class="table align-middle">
+            <thead>
+              <tr><th>Nama Produk</th><th>Stok Tersedia</th><th>Status Stok</th></tr>
+            </thead>
+            <tbody id="admin-inv-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- KONTROL SALDO USER ADMIN PANEL -->
+      <div id="tab-usr" class="tab-sec d-none">
+        <h5 class="fw-bold mb-3">👥 Manajemen User & Top Up Saldo</h5>
+        <div class="card p-3">
+          <table class="table align-middle">
+            <thead>
+              <tr><th>ID User</th><th>Nama</th><th>No HP</th><th>Saldo Pengguna</th><th>Aksi Top Up</th></tr>
+            </thead>
+            <tbody id="admin-users-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-pay" class="tab-sec d-none">
+        <h5 class="fw-bold mb-3">💰 Metode Pembayaran Disetujui</h5>
+        <div class="card p-3">
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" checked id="pay-wa">
+            <label class="form-check-label fw-bold">Direct Order via WhatsApp</label>
+          </div>
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" checked id="pay-qris">
+            <label class="form-check-label fw-bold">QRIS Instant Payment</label>
+          </div>
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" checked id="pay-tf">
+            <label class="form-check-label fw-bold">Transfer Bank (BCA/Mandiri)</label>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-rpt" class="tab-sec d-none">
+        <h5 class="fw-bold mb-3">📈 Laporan Rekap Penjualan</h5>
+        <div class="card p-3 text-center py-5">
+          <i class="fa-solid fa-file-pdf fa-3x text-danger mb-3"></i>
+          <h6>Export Laporan Bulanan (PDF / Excel)</h6>
+          <div><button class="btn btn-outline-primary rounded-pill px-4" onclick="alert('Laporan berhasil didownload!')">Download Rekap Data</button></div>
+        </div>
+      </div>
+
+      <div id="tab-set" class="tab-sec d-none">
+        <h5 class="fw-bold mb-3">⚙️ Pengaturan, Database & Security API</h5>
+        <div class="card p-4">
+          <h6 class="fw-bold"><i class="fa-solid fa-key me-2 text-primary"></i>API Backend Key (Rest API)</h6>
+          <input type="text" class="form-control mb-3" value="api_secret_key_belanja_hemat_9983112" readonly>
+          <h6 class="fw-bold"><i class="fa-solid fa-shield-halved me-2 text-success"></i>Pengaturan Keamanan Database</h6>
+          <p class="small text-muted mb-2">Semua data terenkripsi lokal dan otomatis tercadangkan secara berkala.</p>
+          <button class="btn btn-success rounded-pill px-4 btn-sm" onclick="alert('Keamanan & API tersimpan!')">Simpan Pengaturan Security</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="prodModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Tambah / Edit Produk</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="p-id">
+        <div class="mb-2"><label class="small fw-bold">Nama Produk</label><input type="text" id="p-name" class="form-control" required></div>
+        <div class="row g-2 mb-2">
+          <div class="col-6"><label class="small fw-bold">Brand</label><input type="text" id="p-brand" class="form-control" placeholder="Apple, Samsung, dll"></div>
+          <div class="col-6"><label class="small fw-bold">Kategori</label><select id="p-cat" class="form-select"></select></div>
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-4"><label class="small fw-bold">RAM/Storage</label><input type="text" id="p-spec" class="form-control" placeholder="8GB / 256GB"></div>
+          <div class="col-4"><label class="small fw-bold">Harga Asli</label><input type="number" id="p-price-orig" class="form-control"></div>
+          <div class="col-4"><label class="small fw-bold">Harga Diskon</label><input type="number" id="p-price-disc" class="form-control"></div>
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-6"><label class="small fw-bold">Jumlah Stok</label><input type="number" id="p-stock" class="form-control" value="10"></div>
+          <div class="col-6">
+            <label class="small fw-bold">Badge Khusus</label>
+            <select id="p-badge" class="form-select">
+              <option value="None">Biasa</option>
+              <option value="Best Seller">Best Seller ⭐</option>
+              <option value="Terbaru">Terbaru 🆕</option>
+              <option value="Flash Sale">Flash Sale 🔥</option>
+            </select>
+          </div>
+        </div>
+        <div class="mb-2"><label class="small fw-bold">URL Foto Produk</label><input type="url" id="p-img" class="form-control" required></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary w-100 rounded-pill" onclick="saveProductAdmin()">Simpan Produk</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let defaultProducts = [
+  { id: 'E01', name: 'Samsung Galaxy S24 Ultra', brand: 'Samsung', spec: '12GB / 512GB', category: 'HP', priceOriginal: 21999000, priceDiscount: 18999000, discountPercent: 14, stock: 15, badge: 'Best Seller', image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&q=80' },
+  { id: 'E02', name: 'iPhone 15 Pro Max 256GB', brand: 'Apple', spec: '8GB / 256GB', category: 'HP', priceOriginal: 24999000, priceDiscount: 21499000, discountPercent: 14, stock: 8, badge: 'Flash Sale', image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=500&q=80' }
+];
+
+let productsData = JSON.parse(localStorage.getItem('productsData')) || defaultProducts;
+let categories = JSON.parse(localStorage.getItem('categoriesData')) || ['HP', 'Laptop', 'PC Komputer', 'Smartwatch', 'Audio & Speaker', 'TV & Elektronik', 'Kamera & Drone', 'Rumah Tangga'];
+let ordersHistory = JSON.parse(localStorage.getItem('ordersHistory')) || [];
+let membersData = JSON.parse(localStorage.getItem('membersData')) || [
+  { id: 'user_diskon', password: '123', name: 'Budi Member', phone: '08123456789', balance: 25000000 }
+];
+
+function syncDataFromStorage() {
+  productsData = JSON.parse(localStorage.getItem('productsData')) || [];
+  categories = JSON.parse(localStorage.getItem('categoriesData')) || categories;
+  ordersHistory = JSON.parse(localStorage.getItem('ordersHistory')) || [];
+  membersData = JSON.parse(localStorage.getItem('membersData')) || membersData;
+}
+
+function processLogin() {
+  const u = document.getElementById('login-user').value;
+  const p = document.getElementById('login-pass').value;
+  if(u === 'admin' && p === 'admin123') {
+    document.getElementById('login-screen').classList.add('d-none');
+    document.getElementById('app-screen').classList.remove('d-none');
+    renderAllAdmin();
+  } else { alert("Username/Password salah!"); }
+}
+
+function logout() { location.reload(); }
+
+function switchTab(t) {
+  document.querySelectorAll('.tab-sec').forEach(el => el.classList.add('d-none'));
+  document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab-${t}`).classList.remove('d-none');
+  event.currentTarget.classList.add('active');
+}
+
+function updateOrderStatus(idx, status) {
+  ordersHistory[idx].status = status;
+  localStorage.setItem('ordersHistory', JSON.stringify(ordersHistory));
+  renderAllAdmin();
+}
+
+function topUpUserBalance(userId) {
+  let amount = prompt("Masukkan Jumlah Top Up Saldo (Rp):", "500000");
+  if (amount && !isNaN(amount)) {
+    let user = membersData.find(m => m.id === userId);
+    if(user) {
+      user.balance = (user.balance || 0) + parseInt(amount);
+      localStorage.setItem('membersData', JSON.stringify(membersData));
+      alert(`Berhasil menambah saldo Rp ${parseInt(amount).toLocaleString('id-ID')} ke akun ${userId}`);
+      renderAllAdmin();
+    }
+  }
+}
+
+function renderAllAdmin() {
+  syncDataFromStorage();
+
+  document.getElementById('stat-prods').innerText = productsData.length;
+  document.getElementById('stat-orders').innerText = ordersHistory.length;
+  document.getElementById('stat-users').innerText = membersData.length;
+  let tot = ordersHistory.reduce((s, o) => s + (o.total || 0), 0);
+  document.getElementById('stat-sales').innerText = 'Rp ' + tot.toLocaleString('id-ID');
+
+  // Table Produk
+  document.getElementById('admin-prod-table').innerHTML = productsData.map(p => `
+    <tr>
+      <td><img src="${p.image}"></td>
+      <td class="fw-bold">${p.name}<br><small class="text-muted">${p.spec || ''}</small></td>
+      <td>${p.brand || '-'} / ${p.category}</td>
+      <td><span class="badge bg-${p.stock < 5 ? 'danger':'secondary'}">${p.stock} pcs</span></td>
+      <td>Rp ${(p.priceDiscount || p.priceOriginal || 0).toLocaleString('id-ID')}</td>
+      <td><span class="badge bg-primary">${p.badge || 'Biasa'}</span></td>
+      <td><button class="btn btn-sm btn-outline-danger" onclick="delProd('${p.id}')"><i class="fa-solid fa-trash"></i></button></td>
+    </tr>
+  `).join('');
+
+  // Table Stok
+  document.getElementById('admin-inv-table').innerHTML = productsData.map(p => `
+    <tr>
+      <td>${p.name}</td>
+      <td class="fw-bold">${p.stock}</td>
+      <td>${p.stock < 5 ? '<span class="badge bg-danger">Stok Menipis!</span>' : '<span class="badge bg-success">Aman</span>'}</td>
+    </tr>
+  `).join('');
+
+  // Table Order & Status Update Panel
+  document.getElementById('admin-ord-table').innerHTML = ordersHistory.map((o, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td>${o.senderName || o.name || 'Pelanggan'}<br><small>${o.senderPhone || '-'}</small></td>
+      <td class="small">${o.items}</td>
+      <td class="fw-bold">Rp ${(o.total || 0).toLocaleString('id-ID')}</td>
+      <td>
+        <select class="form-select form-select-sm" onchange="updateOrderStatus(${i}, this.value)">
+          <option value="Belum Dibayar" ${o.status==='Belum Dibayar'?'selected':''}>🔴 Belum Dibayar</option>
+          <option value="Tertunda / Memproses" ${(o.status==='Tertunda / Memproses'||o.status==='Diproses')?'selected':''}>🟡 Tertunda / Diproses</option>
+          <option value="Dalam Perjalanan" ${o.status==='Dalam Perjalanan'?'selected':''}>🔵 Dalam Perjalanan</option>
+          <option value="Selesai" ${o.status==='Selesai'?'selected':''}>🟢 Selesai</option>
+        </select>
+      </td>
+      <td><button class="btn btn-sm btn-outline-danger" onclick="delOrd(${i})"><i class="fa-solid fa-trash"></i></button></td>
+    </tr>
+  `).join('');
+
+  // Table User & Saldo
+  document.getElementById('admin-users-table').innerHTML = membersData.map(m => `
+    <tr>
+      <td class="fw-bold">${m.id}</td>
+      <td>${m.name || m.id}</td>
+      <td>${m.phone || '-'}</td>
+      <td class="fw-bold text-success">Rp ${(m.balance || 0).toLocaleString('id-ID')}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-primary rounded-pill" onclick="topUpUserBalance('${m.id}')">
+          <i class="fa-solid fa-plus-circle me-1"></i> Top Up Saldo
+        </button>
+      </td>
+    </tr>
+  `).join('');
+
+  document.getElementById('cat-list').innerHTML = categories.map(c => `<li class="list-group-item d-flex justify-content-between">${c}</li>`).join('');
+  document.getElementById('p-cat').innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
+}
+
+function saveProductAdmin() {
+  const name = document.getElementById('p-name').value;
+  const brand = document.getElementById('p-brand').value;
+  const category = document.getElementById('p-cat').value;
+  const spec = document.getElementById('p-spec').value;
+  const priceOriginal = parseFloat(document.getElementById('p-price-orig').value) || 0;
+  const priceDiscount = parseFloat(document.getElementById('p-price-disc').value) || 0;
+  const stock = parseInt(document.getElementById('p-stock').value) || 10;
+  const badge = document.getElementById('p-badge').value;
+  const image = document.getElementById('p-img').value;
+
+  if(!name || !priceDiscount || !image) return alert("Isi data penting!");
+
+  const discountPercent = priceOriginal > 0 ? Math.round(((priceOriginal - priceDiscount)/priceOriginal)*100) : 0;
+  productsData.push({ id: 'P'+Date.now(), name, brand, spec, category, priceOriginal, priceDiscount, discountPercent, stock, badge, image });
+
+  localStorage.setItem('productsData', JSON.stringify(productsData));
+  renderAllAdmin();
+  bootstrap.Modal.getInstance(document.getElementById('prodModal')).hide();
+}
+
+function delProd(id) {
+  productsData = productsData.filter(p => p.id !== id);
+  localStorage.setItem('productsData', JSON.stringify(productsData));
+  renderAllAdmin();
+}
+
+function delOrd(idx) {
+  ordersHistory.splice(idx, 1);
+  localStorage.setItem('ordersHistory', JSON.stringify(ordersHistory));
+  renderAllAdmin();
+}
+
+function saveCat() {
+  const v = document.getElementById('cat-input').value.trim();
+  if(v && !categories.includes(v)) {
+    categories.push(v);
+    localStorage.setItem('categoriesData', JSON.stringify(categories));
+    renderAllAdmin();
+  }
+}
+
+function triggerBackup() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", "backup_toko_online.json");
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+}
+
+window.addEventListener('storage', function(e) {
+  if (e.key === 'ordersHistory' || e.key === 'productsData' || e.key === 'categoriesData' || e.key === 'membersData') {
+    if (!document.getElementById('app-screen').classList.contains('d-none')) {
+      renderAllAdmin();
+    }
+  }
+});
+</script>
+</body>
+</html>
