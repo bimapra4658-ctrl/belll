@@ -730,15 +730,30 @@ function addToCart(id) {
   if (item) item.qty++; else cart.push({ id: prod.id, name: prod.name, price: priceToUse, qty: 1 });
   updateCartUI();
 }
-
+function updateQty(index, change) {
+    cart[index].qty += change;
+    if (cart[index].qty <= 0) {
+        cart.splice(index, 1);
+    }
+  updateCartUI();
+}
 function updateCartUI() {
   document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0);
   const container = document.getElementById('cart-items');
   let total = 0, html = '';
-  cart.forEach(item => {
+cart.forEach((item, index) => {
     let sub = item.price * item.qty; total += sub;
-    html += `<tr><td class="small fw-bold">${item.name}</td><td>Rp ${item.price.toLocaleString('id-ID')}</td><td>${item.qty}</td><td class="fw-bold">Rp ${sub.toLocaleString('id-ID')}</td></tr>`;
-  });
+    html += `<tr>
+        <td class="small fw-bold">${item.name}</td>
+        <td>Rp ${item.price.toLocaleString('id-ID')}</td>
+        <td class="align-middle">
+            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="updateQty(${index}, -1)">-</button>
+            <span class="mx-2 fw-bold">${item.qty}</span>
+            <button type="button" class="btn btn-sm btn-outline-success py-0 px-2" onclick="updateQty(${index}, 1)">+</button>
+        </td>
+        <td class="fw-bold">Rp ${sub.toLocaleString('id-ID')}</td>
+    </tr>`;
+});
   container.innerHTML = html;
   document.getElementById('cart-total').innerText = 'Rp ' + total.toLocaleString('id-ID');
 }
